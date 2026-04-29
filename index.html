@@ -1,0 +1,494 @@
+import React, { useState, useEffect } from 'react';
+import { Mail, Linkedin, Calendar, ChevronRight, Sparkles, Target, TrendingUp, PenTool, ArrowUp, CheckCircle, AlertCircle } from 'lucide-react';
+
+export default function Portfolio() {
+  const [activeSection, setActiveSection] = useState('hero');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: ''
+  });
+  const [formErrors, setFormErrors] = useState({});
+  const [submitStatus, setSubmitStatus] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = ['hero', 'about', 'services', 'projects', 'contact'];
+      const current = sections.find(section => {
+        const element = document.getElementById(section);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          return rect.top <= 100 && rect.bottom >= 100;
+        }
+        return false;
+      });
+      if (current) setActiveSection(current);
+      
+      setShowScrollTop(window.scrollY > 500);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToSection = (id) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      setIsMenuOpen(false);
+    }
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    
+    if (!formData.name.trim()) {
+      errors.name = 'Imię jest wymagane';
+    }
+    
+    if (!formData.email.trim()) {
+      errors.email = 'Email jest wymagany';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = 'Podaj poprawny adres email';
+    }
+    
+    if (!formData.message.trim()) {
+      errors.message = 'Wiadomość jest wymagana';
+    } else if (formData.message.trim().length < 10) {
+      errors.message = 'Wiadomość musi mieć minimum 10 znaków';
+    }
+    
+    return errors;
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    
+    if (formErrors[name]) {
+      setFormErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+
+    try {
+      // Symulacja zapisu do bazy danych
+      // W produkcji zamień na prawdziwe API (Supabase/Firestore)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Przykład z Supabase:
+      // const { data, error } = await supabase
+      //   .from('contacts')
+      //   .insert([formData]);
+      // if (error) throw error;
+
+      // Przykład z Firestore:
+      // await addDoc(collection(db, "contacts"), {
+      //   ...formData,
+      //   timestamp: serverTimestamp()
+      // });
+
+      setSubmitStatus('success');
+      setFormData({ name: '', email: '', message: '' });
+      
+      setTimeout(() => {
+        setSubmitStatus(null);
+      }, 5000);
+      
+    } catch (error) {
+      console.error('Błąd wysyłania:', error);
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white">
+      {/* Navigation */}
+      <nav className="fixed top-0 w-full bg-gray-900/95 backdrop-blur-sm z-50 border-b border-gray-800">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center font-bold text-lg">
+              JR
+            </div>
+            <span className="font-semibold text-lg hidden sm:block">Jakub Rząca</span>
+          </div>
+          
+          <div className="hidden md:flex space-x-8">
+            {['O mnie', 'Usługi', 'Projekty', 'Kontakt'].map((item, idx) => {
+              const id = ['about', 'services', 'projects', 'contact'][idx];
+              return (
+                <button
+                  key={item}
+                  onClick={() => scrollToSection(id)}
+                  className={`hover:text-purple-400 transition-colors ${
+                    activeSection === id ? 'text-purple-400' : ''
+                  }`}
+                >
+                  {item}
+                </button>
+              );
+            })}
+          </div>
+
+          <button 
+            className="md:hidden text-white"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            <div className="space-y-1">
+              <div className="w-6 h-0.5 bg-white"></div>
+              <div className="w-6 h-0.5 bg-white"></div>
+              <div className="w-6 h-0.5 bg-white"></div>
+            </div>
+          </button>
+        </div>
+
+        {isMenuOpen && (
+          <div className="md:hidden bg-gray-800 border-t border-gray-700">
+            {['O mnie', 'Usługi', 'Projekty', 'Kontakt'].map((item, idx) => {
+              const id = ['about', 'services', 'projects', 'contact'][idx];
+              return (
+                <button
+                  key={item}
+                  onClick={() => scrollToSection(id)}
+                  className="block w-full text-left px-6 py-3 hover:bg-gray-700 transition-colors"
+                >
+                  {item}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </nav>
+
+      {/* Hero Section */}
+      <section id="hero" className="min-h-screen flex items-center justify-center px-6 pt-20">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="mb-6 inline-block">
+            <span className="bg-purple-500/20 text-purple-300 px-4 py-2 rounded-full text-sm font-medium">
+              Digital Marketing Specialist
+            </span>
+          </div>
+          
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+            Cześć, fajnie,<br />że wpadłeś!
+          </h1>
+          
+          <div className="text-xl md:text-2xl text-gray-300 mb-4">
+            <span className="text-purple-400 font-semibold">Jakub Rząca</span>
+          </div>
+          
+          <p className="text-xl md:text-2xl text-gray-300 mb-12 leading-relaxed">
+            Zajmuję się <span className="text-purple-400 font-semibold">digital marketingiem dla ecommerce</span>.
+            <br />
+            Łączę email marketing, automatyzacje, strategię oraz performance marketing.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button 
+              onClick={() => scrollToSection('projects')}
+              className="bg-purple-500 hover:bg-purple-600 text-white px-8 py-4 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all transform hover:scale-105"
+            >
+              Zobacz projekty
+              <ChevronRight size={20} />
+            </button>
+            <button 
+              onClick={() => scrollToSection('contact')}
+              className="bg-gray-800 hover:bg-gray-700 text-white px-8 py-4 rounded-lg font-semibold transition-all border border-gray-700"
+            >
+              Napisz do mnie
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section id="about" className="py-20 px-6 bg-gray-800/50">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-4xl md:text-5xl font-bold mb-12 text-center">
+            O mnie
+          </h2>
+          
+          <div className="bg-gray-800 rounded-2xl p-8 md:p-12 border border-gray-700">
+            <div className="flex items-start gap-4 mb-6">
+              <Sparkles className="text-purple-400 flex-shrink-0 mt-1" size={24} />
+              <p className="text-lg text-gray-300 leading-relaxed">
+                Mam na imię <span className="text-white font-semibold">Kuba</span> i od dwóch lat działam w digital marketingu. Uważam, że moją najmocniejszą stroną, a zarazem tą, w której mam najwięcej doświadczenia jest <span className="text-purple-400 font-semibold">email marketing i automatyzacja marketingu</span>.
+              </p>
+            </div>
+
+            <div className="flex items-start gap-4 mb-6">
+              <Target className="text-purple-400 flex-shrink-0 mt-1" size={24} />
+              <p className="text-lg text-gray-300 leading-relaxed">
+                Lubię łączyć kreatywność z analitycznym myśleniem, dzięki temu strategie, które tworzę, są jednocześnie <span className="text-white font-semibold">sensowne, skuteczne i dopasowane do realnych potrzeb sklepu</span>.
+              </p>
+            </div>
+
+            <div className="flex items-start gap-4 mb-6">
+              <TrendingUp className="text-purple-400 flex-shrink-0 mt-1" size={24} />
+              <p className="text-lg text-gray-300 leading-relaxed">
+                Poza automatyzacją zajmuję się także <span className="text-white font-semibold">SEO contentem oraz tworzeniem reklam Meta</span>.
+              </p>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <PenTool className="text-purple-400 flex-shrink-0 mt-1" size={24} />
+              <p className="text-lg text-gray-300 leading-relaxed">
+                Planowałem i wdrażałem strategie komunikacji dla sklepów e-commerce, tworzyłem flowy, kampanie oraz pełne customer journeys.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section id="services" className="py-20 px-6">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-center">
+            Jak mogę Ci pomóc
+          </h2>
+          <p className="text-gray-400 text-center mb-16 text-lg">
+            Kompleksowe usługi digital marketingu
+          </p>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-gray-800 rounded-xl p-8 border border-gray-700 hover:border-purple-500 transition-all">
+              <Mail className="text-purple-400 mb-4" size={32} />
+              <h3 className="text-2xl font-bold mb-3">Email marketing</h3>
+              <p className="text-gray-300 leading-relaxed">
+                Wdrażam oraz tworzę strategię dla Twojego sklepu
+              </p>
+            </div>
+
+            <div className="bg-gray-800 rounded-xl p-8 border border-gray-700 hover:border-purple-500 transition-all">
+              <Sparkles className="text-purple-400 mb-4" size={32} />
+              <h3 className="text-2xl font-bold mb-3">Marketing automation</h3>
+              <p className="text-gray-300 leading-relaxed">
+                Projektuję customer journeys i wdrażam je tak, aby pracowały za Ciebie 24/7
+              </p>
+            </div>
+
+            <div className="bg-gray-800 rounded-xl p-8 border border-gray-700 hover:border-purple-500 transition-all">
+              <PenTool className="text-purple-400 mb-4" size={32} />
+              <h3 className="text-2xl font-bold mb-3">SEO & copy</h3>
+              <p className="text-gray-300 leading-relaxed">
+                Piszę treści, które są jednocześnie przyjazne dla algorytmów i ludzi
+              </p>
+            </div>
+
+            <div className="bg-gray-800 rounded-xl p-8 border border-gray-700 hover:border-purple-500 transition-all">
+              <Target className="text-purple-400 mb-4" size={32} />
+              <h3 className="text-2xl font-bold mb-3">Meta Ads</h3>
+              <p className="text-gray-300 leading-relaxed">
+                Tworzę reklamy, które wspierają sprzedaż i cały lejek
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Projects Section */}
+      <section id="projects" className="py-20 px-6 bg-gray-800/50">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            Moje projekty
+          </h2>
+          <p className="text-xl text-gray-300 mb-12">
+            Znajdziesz tu przykładowe maile, automatyzacje oraz artykuły SEO
+          </p>
+
+          <a 
+            href="https://drive.google.com/drive/folders/14pxFI_bcEJdWADP3tlIlDfX7sMA3fiaT?usp=drive_link"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 bg-purple-500 hover:bg-purple-600 text-white px-10 py-5 rounded-lg font-semibold text-lg transition-all transform hover:scale-105"
+          >
+            <span>Zobacz portfolio</span>
+            <ChevronRight size={24} />
+          </a>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="py-20 px-6">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-center">
+            Zbudujmy coś razem!
+          </h2>
+          <p className="text-xl text-gray-300 mb-12 text-center">
+            📬 Odezwij się, może zrobimy razem coś naprawdę fajnego
+          </p>
+
+          {/* Success Message */}
+          {submitStatus === 'success' && (
+            <div className="mb-8 bg-green-500/20 border border-green-500 rounded-lg p-4 flex items-center gap-3">
+              <CheckCircle className="text-green-400 flex-shrink-0" size={24} />
+              <div>
+                <p className="text-green-400 font-semibold">Wiadomość wysłana!</p>
+                <p className="text-green-300 text-sm">Dziękuję za kontakt. Odpiszę najszybciej jak to możliwe!</p>
+              </div>
+            </div>
+          )}
+
+          {/* Error Message */}
+          {submitStatus === 'error' && (
+            <div className="mb-8 bg-red-500/20 border border-red-500 rounded-lg p-4 flex items-center gap-3">
+              <AlertCircle className="text-red-400 flex-shrink-0" size={24} />
+              <div>
+                <p className="text-red-400 font-semibold">Wystąpił błąd</p>
+                <p className="text-red-300 text-sm">Spróbuj ponownie lub skontaktuj się bezpośrednio przez email.</p>
+              </div>
+            </div>
+          )}
+
+          <div className="bg-gray-800 rounded-2xl p-8 md:p-12 border border-gray-700 mb-12">
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium mb-2 text-gray-300">
+                  Imię <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className={`w-full bg-gray-900 border ${formErrors.name ? 'border-red-500' : 'border-gray-700'} rounded-lg px-4 py-3 focus:outline-none focus:border-purple-500 transition-colors`}
+                  placeholder="Twoje imię"
+                />
+                {formErrors.name && (
+                  <p className="mt-1 text-sm text-red-400">{formErrors.name}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2 text-gray-300">
+                  Email <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className={`w-full bg-gray-900 border ${formErrors.email ? 'border-red-500' : 'border-gray-700'} rounded-lg px-4 py-3 focus:outline-none focus:border-purple-500 transition-colors`}
+                  placeholder="twoj@email.pl"
+                />
+                {formErrors.email && (
+                  <p className="mt-1 text-sm text-red-400">{formErrors.email}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2 text-gray-300">
+                  Wiadomość <span className="text-red-400">*</span>
+                </label>
+                <textarea
+                  name="message"
+                  value={formData.message}
+                  onChange={handleInputChange}
+                  rows="5"
+                  className={`w-full bg-gray-900 border ${formErrors.message ? 'border-red-500' : 'border-gray-700'} rounded-lg px-4 py-3 focus:outline-none focus:border-purple-500 transition-colors resize-none`}
+                  placeholder="Opowiedz o swoim projekcie..."
+                ></textarea>
+                {formErrors.message && (
+                  <p className="mt-1 text-sm text-red-400">{formErrors.message}</p>
+                )}
+              </div>
+
+              <button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className={`w-full bg-purple-500 hover:bg-purple-600 text-white px-8 py-4 rounded-lg font-semibold transition-all transform hover:scale-105 ${
+                  isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                {isSubmitting ? 'Wysyłanie...' : 'Wyślij wiadomość'}
+              </button>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <a
+              href="https://calendly.com/jcob-business-writting"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 bg-gray-800 hover:bg-gray-700 p-6 rounded-xl border border-gray-700 transition-all"
+            >
+              <Calendar className="text-purple-400" size={24} />
+              <div>
+                <div className="font-semibold">Zarezerwuj call</div>
+                <div className="text-sm text-gray-400">Calendly</div>
+              </div>
+            </a>
+
+            <a
+              href="https://www.linkedin.com/in/jakub-rząca-435b1b265"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 bg-gray-800 hover:bg-gray-700 p-6 rounded-xl border border-gray-700 transition-all"
+            >
+              <Linkedin className="text-purple-400" size={24} />
+              <div>
+                <div className="font-semibold">LinkedIn</div>
+                <div className="text-sm text-gray-400">Połączmy się</div>
+              </div>
+            </a>
+
+            <a
+              href="mailto:jcob.business.writting@gmail.com"
+              className="flex items-center gap-3 bg-gray-800 hover:bg-gray-700 p-6 rounded-xl border border-gray-700 transition-all"
+            >
+              <Mail className="text-purple-400" size={24} />
+              <div>
+                <div className="font-semibold">Email</div>
+                <div className="text-sm text-gray-400">Napisz bezpośrednio</div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-8 px-6 border-t border-gray-800">
+        <div className="max-w-6xl mx-auto text-center text-gray-400">
+          <p>© 2025 Jakub Rząca. Wszystkie prawa zastrzeżone.</p>
+        </div>
+      </footer>
+
+      {/* Scroll to Top Button */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 bg-purple-500 hover:bg-purple-600 text-white p-4 rounded-full shadow-lg transition-all transform hover:scale-110 z-40"
+          aria-label="Przewiń do góry"
+        >
+          <ArrowUp size={24} />
+        </button>
+      )}
+    </div>
+  );
+}
