@@ -1,15 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { Mail, Linkedin, Calendar, ChevronRight, Sparkles, Target, TrendingUp, PenTool, ArrowUp, CheckCircle, AlertCircle } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jakub Rząca – Email Marketing & Automation</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.383.0/umd/lucide.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #111827; color: #fff; }
+  #root { min-height: 100vh; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect } = React;
+const { Mail, Linkedin, Calendar, ChevronRight, Sparkles, Target, TrendingUp, PenTool, ArrowUp, CheckCircle, AlertCircle } = lucide;
 
-export default function Portfolio() {
+function Portfolio() {
   const [activeSection, setActiveSection] = useState('hero');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: ''
-  });
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [formErrors, setFormErrors] = useState({});
   const [submitStatus, setSubmitStatus] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,469 +42,351 @@ export default function Portfolio() {
         return false;
       });
       if (current) setActiveSection(current);
-      
       setShowScrollTop(window.scrollY > 500);
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const scrollToSection = (id) => {
     const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-      setIsMenuOpen(false);
-    }
+    if (element) { element.scrollIntoView({ behavior: 'smooth' }); setIsMenuOpen(false); }
   };
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
   const validateForm = () => {
     const errors = {};
-    
-    if (!formData.name.trim()) {
-      errors.name = 'Imię jest wymagane';
-    }
-    
-    if (!formData.email.trim()) {
-      errors.email = 'Email jest wymagany';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = 'Podaj poprawny adres email';
-    }
-    
-    if (!formData.message.trim()) {
-      errors.message = 'Wiadomość jest wymagana';
-    } else if (formData.message.trim().length < 10) {
-      errors.message = 'Wiadomość musi mieć minimum 10 znaków';
-    }
-    
+    if (!formData.name.trim()) errors.name = 'Imie jest wymagane';
+    if (!formData.email.trim()) errors.email = 'Email jest wymagany';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = 'Podaj poprawny adres email';
+    if (!formData.message.trim()) errors.message = 'Wiadomosc jest wymagana';
+    else if (formData.message.trim().length < 10) errors.message = 'Wiadomosc musi miec minimum 10 znakow';
     return errors;
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    
-    if (formErrors[name]) {
-      setFormErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (formErrors[name]) setFormErrors(prev => ({ ...prev, [name]: '' }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     const errors = validateForm();
-    if (Object.keys(errors).length > 0) {
-      setFormErrors(errors);
-      return;
-    }
-
-    setIsSubmitting(true);
-    setSubmitStatus(null);
-
+    if (Object.keys(errors).length > 0) { setFormErrors(errors); return; }
+    setIsSubmitting(true); setSubmitStatus(null);
     try {
-      // Symulacja zapisu do bazy danych
-      // W produkcji zamień na prawdziwe API (Supabase/Firestore)
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Przykład z Supabase:
-      // const { data, error } = await supabase
-      //   .from('contacts')
-      //   .insert([formData]);
-      // if (error) throw error;
-
-      // Przykład z Firestore:
-      // await addDoc(collection(db, "contacts"), {
-      //   ...formData,
-      //   timestamp: serverTimestamp()
-      // });
-
       setSubmitStatus('success');
       setFormData({ name: '', email: '', message: '' });
-      
-      setTimeout(() => {
-        setSubmitStatus(null);
-      }, 5000);
-      
+      setTimeout(() => setSubmitStatus(null), 5000);
     } catch (error) {
-      console.error('Błąd wysyłania:', error);
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const navStyle = {
+    position: 'fixed', top: 0, width: '100%',
+    background: 'rgba(17,24,39,0.97)', backdropFilter: 'blur(8px)',
+    zIndex: 50, borderBottom: '1px solid #1f2937'
+  };
+  const navInner = {
+    maxWidth: 1152, margin: '0 auto', padding: '16px 24px',
+    display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+  };
+  const logoBox = {
+    width: 40, height: 40,
+    background: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
+    borderRadius: 8, display: 'flex', alignItems: 'center',
+    justifyContent: 'center', fontWeight: 700, fontSize: 18, flexShrink: 0
+  };
+  const btnPrimary = {
+    background: '#8b5cf6', color: '#fff', padding: '16px 32px',
+    borderRadius: 8, fontWeight: 600, border: 'none', cursor: 'pointer',
+    display: 'inline-flex', alignItems: 'center', gap: 8,
+    fontSize: 16, transition: 'background 0.2s', textDecoration: 'none'
+  };
+  const btnSecondary = {
+    background: '#1f2937', color: '#fff', padding: '16px 32px',
+    borderRadius: 8, fontWeight: 600, border: '1px solid #374151',
+    cursor: 'pointer', fontSize: 16, transition: 'background 0.2s'
+  };
+  const card = {
+    background: '#1f2937', borderRadius: 16, padding: '32px 48px',
+    border: '1px solid #374151'
+  };
+  const serviceCard = {
+    background: '#1f2937', borderRadius: 12, padding: 32,
+    border: '1px solid #374151', transition: 'border-color 0.2s'
+  };
+  const inputStyle = (err) => ({
+    width: '100%', background: '#111827',
+    border: `1px solid ${err ? '#ef4444' : '#374151'}`,
+    borderRadius: 8, padding: '12px 16px', color: '#fff',
+    fontSize: 16, outline: 'none', fontFamily: 'Inter, sans-serif',
+    transition: 'border-color 0.2s'
+  });
+  const contactCard = {
+    display: 'flex', alignItems: 'center', gap: 12,
+    background: '#1f2937', padding: 24, borderRadius: 12,
+    border: '1px solid #374151', textDecoration: 'none', color: '#fff',
+    transition: 'background 0.2s'
+  };
+
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-gray-900/95 backdrop-blur-sm z-50 border-b border-gray-800">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center font-bold text-lg">
-              JR
-            </div>
-            <span className="font-semibold text-lg hidden sm:block">Jakub Rząca</span>
-          </div>
-          
-          <div className="hidden md:flex space-x-8">
-            {['O mnie', 'Usługi', 'Projekty', 'Kontakt'].map((item, idx) => {
+    React.createElement('div', { style: { minHeight: '100vh', background: '#111827', color: '#fff' } },
+
+      React.createElement('nav', { style: navStyle },
+        React.createElement('div', { style: navInner },
+          React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: 12 } },
+            React.createElement('div', { style: logoBox }, 'JR'),
+            React.createElement('span', { style: { fontWeight: 600, fontSize: 18 } }, 'Jakub Rz\u0105ca')
+          ),
+          React.createElement('div', { style: { display: 'flex', gap: 32 }, id: 'desktop-nav' },
+            ['O mnie', 'Us\u0142ugi', 'Projekty', 'Kontakt'].map((item, idx) => {
               const id = ['about', 'services', 'projects', 'contact'][idx];
-              return (
-                <button
-                  key={item}
-                  onClick={() => scrollToSection(id)}
-                  className={`hover:text-purple-400 transition-colors ${
-                    activeSection === id ? 'text-purple-400' : ''
-                  }`}
-                >
-                  {item}
-                </button>
-              );
-            })}
-          </div>
+              return React.createElement('button', {
+                key: item,
+                onClick: () => scrollToSection(id),
+                style: { background: 'none', border: 'none', cursor: 'pointer',
+                  color: activeSection === id ? '#a78bfa' : '#fff',
+                  fontSize: 15, fontFamily: 'Inter, sans-serif', transition: 'color 0.2s' }
+              }, item);
+            })
+          ),
+          React.createElement('button', {
+            onClick: () => setIsMenuOpen(!isMenuOpen),
+            id: 'mobile-menu-btn',
+            style: { background: 'none', border: 'none', cursor: 'pointer', flexDirection: 'column', gap: 4, display: 'none' }
+          },
+            React.createElement('div', { style: { width: 24, height: 2, background: '#fff', marginBottom: 4 } }),
+            React.createElement('div', { style: { width: 24, height: 2, background: '#fff', marginBottom: 4 } }),
+            React.createElement('div', { style: { width: 24, height: 2, background: '#fff' } })
+          )
+        ),
+        isMenuOpen && React.createElement('div', { style: { background: '#1f2937', borderTop: '1px solid #374151' } },
+          ['O mnie', 'Us\u0142ugi', 'Projekty', 'Kontakt'].map((item, idx) => {
+            const id = ['about', 'services', 'projects', 'contact'][idx];
+            return React.createElement('button', {
+              key: item,
+              onClick: () => scrollToSection(id),
+              style: { display: 'block', width: '100%', textAlign: 'left',
+                padding: '12px 24px', background: 'none', border: 'none',
+                color: '#fff', fontSize: 15, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }
+            }, item);
+          })
+        )
+      ),
 
-          <button 
-            className="md:hidden text-white"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            <div className="space-y-1">
-              <div className="w-6 h-0.5 bg-white"></div>
-              <div className="w-6 h-0.5 bg-white"></div>
-              <div className="w-6 h-0.5 bg-white"></div>
-            </div>
-          </button>
-        </div>
+      React.createElement('section', { id: 'hero', style: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 24px 40px' } },
+        React.createElement('div', { style: { maxWidth: 896, margin: '0 auto', textAlign: 'center' } },
+          React.createElement('div', { style: { marginBottom: 24 } },
+            React.createElement('span', { style: { background: 'rgba(139,92,246,0.2)', color: '#c4b5fd', padding: '8px 20px', borderRadius: 99, fontSize: 14, fontWeight: 500 } },
+              'Email Marketing & Automation'
+            )
+          ),
+          React.createElement('h1', { style: { fontSize: 'clamp(2.5rem, 8vw, 5rem)', fontWeight: 800, marginBottom: 24, lineHeight: 1.1 } },
+            'Cze\u015b\u0107, fajnie', React.createElement('br'), 'że wpad\u0142e\u015b!'
+          ),
+          React.createElement('p', { style: { fontSize: 'clamp(1rem, 2.5vw, 1.25rem)', color: '#d1d5db', marginBottom: 48, lineHeight: 1.7 } },
+            'Specjalizuj\u0119 si\u0119 w ',
+            React.createElement('span', { style: { color: '#a78bfa', fontWeight: 600 } }, 'email marketingu i marketing automation'),
+            ' dla e-commerce.',
+            React.createElement('br'),
+            'Pomagam markom zwi\u0119ksza\u0107 sprzeda\u017c, retencj\u0119 i warto\u015b\u0107 klienta dzi\u0119ki skutecznym kampaniom oraz automatyzacjom.'
+          ),
+          React.createElement('div', { style: { display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' } },
+            React.createElement('button', {
+              onClick: () => scrollToSection('projects'),
+              style: btnPrimary,
+              onMouseOver: e => e.currentTarget.style.background='#7c3aed',
+              onMouseOut: e => e.currentTarget.style.background='#8b5cf6'
+            }, 'Zobacz projekty ', React.createElement(ChevronRight, { size: 20 })),
+            React.createElement('button', {
+              onClick: () => scrollToSection('contact'),
+              style: btnSecondary,
+              onMouseOver: e => e.currentTarget.style.background='#374151',
+              onMouseOut: e => e.currentTarget.style.background='#1f2937'
+            }, 'Skontaktuj si\u0119')
+          )
+        )
+      ),
 
-        {isMenuOpen && (
-          <div className="md:hidden bg-gray-800 border-t border-gray-700">
-            {['O mnie', 'Usługi', 'Projekty', 'Kontakt'].map((item, idx) => {
-              const id = ['about', 'services', 'projects', 'contact'][idx];
-              return (
-                <button
-                  key={item}
-                  onClick={() => scrollToSection(id)}
-                  className="block w-full text-left px-6 py-3 hover:bg-gray-700 transition-colors"
-                >
-                  {item}
-                </button>
-              );
-            })}
-          </div>
-        )}
-      </nav>
+      React.createElement('section', { id: 'about', style: { padding: '80px 24px', background: 'rgba(31,41,55,0.5)' } },
+        React.createElement('div', { style: { maxWidth: 896, margin: '0 auto' } },
+          React.createElement('h2', { style: { fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 700, marginBottom: 48, textAlign: 'center' } }, 'O mnie'),
+          React.createElement('div', { style: card },
+            [
+              { Icon: Sparkles, content: React.createElement(React.Fragment, null, 'Mam na imi\u0119 ', React.createElement('strong', null, 'Kuba'), ' i od ponad dw\u00f3ch lat rozwijam si\u0119 w digital marketingu, ze szczeg\u00f3lnym naciskiem na ', React.createElement('span', { style: { color: '#a78bfa', fontWeight: 600 } }, 'email marketing i marketing automation'), ' dla e-commerce.') },
+              { Icon: Target, content: React.createElement(React.Fragment, null, '\u0141\u0105cz\u0119 kreatywno\u015b\u0107 z analitycznym podej\u015bciem, dzi\u0119ki czemu tworz\u0119 ', React.createElement('strong', null, 'przemy\u015blane strategie, skuteczne kampanie oraz logicznie zaprojektowane automatyzacje'), '.') },
+              { Icon: TrendingUp, content: React.createElement(React.Fragment, null, 'Stawiam na rozwi\u0105zania, kt\u00f3re nie tylko dobrze wygl\u0105daj\u0105, ale przede wszystkim ', React.createElement('strong', null, 'realnie wspieraj\u0105 sprzeda\u017c i rozw\u00f3j marki'), '.') },
+            ].map(({ Icon, content }, i) =>
+              React.createElement('div', { key: i, style: { display: 'flex', gap: 16, alignItems: 'flex-start', marginBottom: i < 2 ? 24 : 0 } },
+                React.createElement(Icon, { color: '#a78bfa', size: 24, style: { flexShrink: 0, marginTop: 2 } }),
+                React.createElement('p', { style: { color: '#d1d5db', fontSize: 17, lineHeight: 1.7 } }, content)
+              )
+            )
+          )
+        )
+      ),
 
-      {/* Hero Section */}
-      <section id="hero" className="min-h-screen flex items-center justify-center px-6 pt-20">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="mb-6 inline-block">
-            <span className="bg-purple-500/20 text-purple-300 px-4 py-2 rounded-full text-sm font-medium">
-              Digital Marketing Specialist
-            </span>
-          </div>
-          
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-            Cześć, fajnie,<br />że wpadłeś!
-          </h1>
-          
-          <div className="text-xl md:text-2xl text-gray-300 mb-4">
-            <span className="text-purple-400 font-semibold">Jakub Rząca</span>
-          </div>
-          
-          <p className="text-xl md:text-2xl text-gray-300 mb-12 leading-relaxed">
-            Zajmuję się <span className="text-purple-400 font-semibold">digital marketingiem dla ecommerce</span>.
-            <br />
-            Łączę email marketing, automatyzacje, strategię oraz performance marketing.
-          </p>
+      React.createElement('section', { id: 'services', style: { padding: '80px 24px' } },
+        React.createElement('div', { style: { maxWidth: 1152, margin: '0 auto' } },
+          React.createElement('h2', { style: { fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 700, marginBottom: 16, textAlign: 'center' } }, 'Jak mog\u0119 Ci pom\u00f3c?'),
+          React.createElement('p', { style: { color: '#9ca3af', textAlign: 'center', marginBottom: 64, fontSize: 18 } }, 'Wsparcie w email marketingu i marketing automation dla e-commerce'),
+          React.createElement('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 } },
+            [
+              { emoji: '\uD83D\uDCE9', title: 'Kampanie emailowe', text: 'Planuj\u0119 i tworz\u0119 kampanie, kt\u00f3re wspieraj\u0105 sprzeda\u017c, premiery oraz regularny kontakt z klientami.' },
+              { emoji: '\u270D\uFE0F', title: 'Copywriting', text: 'Pisz\u0119 tre\u015bci dopasowane do marki, odbiorc\u00f3w i celu kampanii, kt\u00f3re przyci\u0105gaj\u0105 uwag\u0119 i zach\u0119caj\u0105 do dzia\u0142ania.' },
+              { emoji: '\uD83D\uDD01', title: 'Strategia', text: 'U\u0142adam komunikacj\u0119 emailow\u0105 w sp\u00f3jny system, kt\u00f3ry buduje relacje z klientami i wspiera d\u0142ugoterminowy wzrost marki.' },
+              { emoji: '\u2699\uFE0F', title: 'Automatyzacje', text: 'Projektuj\u0119 sekwencje mailowe, kt\u00f3re dzia\u0142aj\u0105 automatycznie, oszcz\u0119dzaj\u0105 czas i zwi\u0119kszaj\u0105 wyniki sprzeda\u017cowe.' },
+            ].map(({ emoji, title, text }) =>
+              React.createElement('div', {
+                key: title,
+                style: serviceCard,
+                onMouseOver: e => e.currentTarget.style.borderColor='#8b5cf6',
+                onMouseOut: e => e.currentTarget.style.borderColor='#374151'
+              },
+                React.createElement('div', { style: { fontSize: 32, marginBottom: 16 } }, emoji),
+                React.createElement('h3', { style: { fontSize: 22, fontWeight: 700, marginBottom: 12 } }, title),
+                React.createElement('p', { style: { color: '#d1d5db', lineHeight: 1.6 } }, text)
+              )
+            )
+          )
+        )
+      ),
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button 
-              onClick={() => scrollToSection('projects')}
-              className="bg-purple-500 hover:bg-purple-600 text-white px-8 py-4 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all transform hover:scale-105"
-            >
-              Zobacz projekty
-              <ChevronRight size={20} />
-            </button>
-            <button 
-              onClick={() => scrollToSection('contact')}
-              className="bg-gray-800 hover:bg-gray-700 text-white px-8 py-4 rounded-lg font-semibold transition-all border border-gray-700"
-            >
-              Napisz do mnie
-            </button>
-          </div>
-        </div>
-      </section>
+      React.createElement('section', { id: 'projects', style: { padding: '80px 24px', background: 'rgba(31,41,55,0.5)' } },
+        React.createElement('div', { style: { maxWidth: 896, margin: '0 auto', textAlign: 'center' } },
+          React.createElement('h2', { style: { fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 700, marginBottom: 24 } }, 'Moje projekty'),
+          React.createElement('p', { style: { fontSize: 18, color: '#d1d5db', marginBottom: 16 } }, 'Do\u015bwiadczenie zdobywa\u0142em przy projektach z bran\u017cy beauty, fitness, digital products, moda oraz e-commerce.'),
+          React.createElement('p', { style: { fontSize: 16, color: '#9ca3af', marginBottom: 48 } }, 'Tworzy\u0142em kampanie emailowe, sekwencje automatyczne, strategie komunikacji i tre\u015bci sprzeda\u017cowe dopasowane do r\u00f3\u017cnych grup odbiorc\u00f3w.'),
+          React.createElement('a', {
+            href: 'https://drive.google.com/drive/folders/14pxFI_bcEJdWADP3tlIlDfX7sMA3fiaT?usp=drive_link',
+            target: '_blank', rel: 'noopener noreferrer',
+            style: { ...btnPrimary, fontSize: 18, padding: '20px 40px' },
+            onMouseOver: e => e.currentTarget.style.background='#7c3aed',
+            onMouseOut: e => e.currentTarget.style.background='#8b5cf6'
+          },
+            React.createElement('span', null, 'Zobacz projekty'),
+            React.createElement(ChevronRight, { size: 24 })
+          ),
+          React.createElement('p', { style: { marginTop: 16, fontSize: 13, color: '#6b7280' } }, 'Mailingi \u2022 Automatyzacje \u2022 Strategie \u2022 Copywriting')
+        )
+      ),
 
-      {/* About Section */}
-      <section id="about" className="py-20 px-6 bg-gray-800/50">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold mb-12 text-center">
-            O mnie
-          </h2>
-          
-          <div className="bg-gray-800 rounded-2xl p-8 md:p-12 border border-gray-700">
-            <div className="flex items-start gap-4 mb-6">
-              <Sparkles className="text-purple-400 flex-shrink-0 mt-1" size={24} />
-              <p className="text-lg text-gray-300 leading-relaxed">
-                Mam na imię <span className="text-white font-semibold">Kuba</span> i od dwóch lat działam w digital marketingu. Uważam, że moją najmocniejszą stroną, a zarazem tą, w której mam najwięcej doświadczenia jest <span className="text-purple-400 font-semibold">email marketing i automatyzacja marketingu</span>.
-              </p>
-            </div>
+      React.createElement('section', { id: 'contact', style: { padding: '80px 24px' } },
+        React.createElement('div', { style: { maxWidth: 896, margin: '0 auto' } },
+          React.createElement('h2', { style: { fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 700, marginBottom: 24, textAlign: 'center' } }, 'Otwarty na wsp\u00f3\u0142prac\u0119'),
+          React.createElement('p', { style: { fontSize: 18, color: '#d1d5db', marginBottom: 8, textAlign: 'center' } }, 'Je\u015bli szukasz wsparcia w email marketingu, marketing automation lub chcesz porozmawia\u0107 o mo\u017cliwo\u015bciach dzia\u0142ania, napisz do mnie.'),
+          React.createElement('p', { style: { fontSize: 16, color: '#9ca3af', marginBottom: 48, textAlign: 'center' } }, 'Jestem dost\u0119pny zar\u00f3wno na projekty freelance, jak i role zwi\u0105zane z e-commerce lub agencjami.'),
 
-            <div className="flex items-start gap-4 mb-6">
-              <Target className="text-purple-400 flex-shrink-0 mt-1" size={24} />
-              <p className="text-lg text-gray-300 leading-relaxed">
-                Lubię łączyć kreatywność z analitycznym myśleniem, dzięki temu strategie, które tworzę, są jednocześnie <span className="text-white font-semibold">sensowne, skuteczne i dopasowane do realnych potrzeb sklepu</span>.
-              </p>
-            </div>
+          submitStatus === 'success' && React.createElement('div', { style: { marginBottom: 32, background: 'rgba(34,197,94,0.15)', border: '1px solid #22c55e', borderRadius: 8, padding: 16, display: 'flex', gap: 12, alignItems: 'center' } },
+            React.createElement(CheckCircle, { color: '#4ade80', size: 24, style: { flexShrink: 0 } }),
+            React.createElement('div', null,
+              React.createElement('p', { style: { color: '#4ade80', fontWeight: 600 } }, 'Wiadomo\u015b\u0107 wys\u0142ana!'),
+              React.createElement('p', { style: { color: '#86efac', fontSize: 14 } }, 'Dzi\u0119kuj\u0119 za kontakt. Odpisz\u0119 najszybciej jak to mo\u017cliwe!')
+            )
+          ),
+          submitStatus === 'error' && React.createElement('div', { style: { marginBottom: 32, background: 'rgba(239,68,68,0.15)', border: '1px solid #ef4444', borderRadius: 8, padding: 16, display: 'flex', gap: 12, alignItems: 'center' } },
+            React.createElement(AlertCircle, { color: '#f87171', size: 24, style: { flexShrink: 0 } }),
+            React.createElement('div', null,
+              React.createElement('p', { style: { color: '#f87171', fontWeight: 600 } }, 'Wyst\u0105pi\u0142 b\u0142\u0105d'),
+              React.createElement('p', { style: { color: '#fca5a5', fontSize: 14 } }, 'Spr\u00f3buj ponownie lub skontaktuj si\u0119 bezpo\u015brednio przez email.')
+            )
+          ),
 
-            <div className="flex items-start gap-4 mb-6">
-              <TrendingUp className="text-purple-400 flex-shrink-0 mt-1" size={24} />
-              <p className="text-lg text-gray-300 leading-relaxed">
-                Poza automatyzacją zajmuję się także <span className="text-white font-semibold">SEO contentem oraz tworzeniem reklam Meta</span>.
-              </p>
-            </div>
+          React.createElement('div', { style: { ...card, marginBottom: 48 } },
+            React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: 24 } },
+              ['name', 'email'].map(name =>
+                React.createElement('div', { key: name },
+                  React.createElement('label', { style: { display: 'block', fontSize: 14, fontWeight: 500, marginBottom: 8, color: '#d1d5db' } },
+                    name === 'name' ? 'Imi\u0119' : 'Email', ' ', React.createElement('span', { style: { color: '#f87171' } }, '*')
+                  ),
+                  React.createElement('input', {
+                    type: name === 'email' ? 'email' : 'text',
+                    name, value: formData[name], onChange: handleInputChange,
+                    style: inputStyle(formErrors[name]),
+                    placeholder: name === 'name' ? 'Twoje imi\u0119' : 'twoj@email.pl',
+                    onFocus: e => e.target.style.borderColor='#8b5cf6',
+                    onBlur: e => e.target.style.borderColor=formErrors[name] ? '#ef4444' : '#374151'
+                  }),
+                  formErrors[name] && React.createElement('p', { style: { marginTop: 4, fontSize: 13, color: '#f87171' } }, formErrors[name])
+                )
+              ),
+              React.createElement('div', null,
+                React.createElement('label', { style: { display: 'block', fontSize: 14, fontWeight: 500, marginBottom: 8, color: '#d1d5db' } },
+                  'Wiadomo\u015b\u0107 ', React.createElement('span', { style: { color: '#f87171' } }, '*')
+                ),
+                React.createElement('textarea', {
+                  name: 'message', value: formData.message, onChange: handleInputChange, rows: 5,
+                  style: { ...inputStyle(formErrors.message), resize: 'none' },
+                  placeholder: 'Opowiedz o swoim projekcie...',
+                  onFocus: e => e.target.style.borderColor='#8b5cf6',
+                  onBlur: e => e.target.style.borderColor=formErrors.message ? '#ef4444' : '#374151'
+                }),
+                formErrors.message && React.createElement('p', { style: { marginTop: 4, fontSize: 13, color: '#f87171' } }, formErrors.message)
+              ),
+              React.createElement('button', {
+                onClick: handleSubmit, disabled: isSubmitting,
+                style: { ...btnPrimary, justifyContent: 'center', width: '100%', opacity: isSubmitting ? 0.5 : 1 },
+                onMouseOver: e => !isSubmitting && (e.currentTarget.style.background='#7c3aed'),
+                onMouseOut: e => e.currentTarget.style.background='#8b5cf6'
+              }, isSubmitting ? 'Wysy\u0142anie...' : 'Skontaktuj si\u0119')
+            )
+          ),
 
-            <div className="flex items-start gap-4">
-              <PenTool className="text-purple-400 flex-shrink-0 mt-1" size={24} />
-              <p className="text-lg text-gray-300 leading-relaxed">
-                Planowałem i wdrażałem strategie komunikacji dla sklepów e-commerce, tworzyłem flowy, kampanie oraz pełne customer journeys.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+          React.createElement('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 24 } },
+            [
+              { href: 'mailto:jcob.business.writting@gmail.com', Icon: Mail, label: 'Email', sub: 'Napisz bezpo\u015brednio' },
+              { href: 'https://www.linkedin.com/in/jakub-rz\u0105ca-435b1b265', Icon: Linkedin, label: 'LinkedIn', sub: 'Po\u0142\u0105czmy si\u0119' },
+              { href: 'https://calendly.com/jcob-business-writting', Icon: Calendar, label: 'Calendly', sub: 'Zarezerwuj call' },
+            ].map(({ href, Icon, label, sub }) =>
+              React.createElement('a', {
+                key: label, href, target: '_blank', rel: 'noopener noreferrer',
+                style: contactCard,
+                onMouseOver: e => e.currentTarget.style.background='#374151',
+                onMouseOut: e => e.currentTarget.style.background='#1f2937'
+              },
+                React.createElement(Icon, { color: '#a78bfa', size: 24 }),
+                React.createElement('div', null,
+                  React.createElement('div', { style: { fontWeight: 600 } }, label),
+                  React.createElement('div', { style: { fontSize: 13, color: '#9ca3af' } }, sub)
+                )
+              )
+            )
+          )
+        )
+      ),
 
-      {/* Services Section */}
-      <section id="services" className="py-20 px-6">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-center">
-            Jak mogę Ci pomóc
-          </h2>
-          <p className="text-gray-400 text-center mb-16 text-lg">
-            Kompleksowe usługi digital marketingu
-          </p>
+      React.createElement('footer', { style: { padding: '32px 24px', borderTop: '1px solid #1f2937' } },
+        React.createElement('div', { style: { maxWidth: 1152, margin: '0 auto', textAlign: 'center', color: '#6b7280' } },
+          React.createElement('p', null, '\u00a9 2025 Jakub Rz\u0105ca. Wszystkie prawa zastrze\u017cone.')
+        )
+      ),
 
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-gray-800 rounded-xl p-8 border border-gray-700 hover:border-purple-500 transition-all">
-              <Mail className="text-purple-400 mb-4" size={32} />
-              <h3 className="text-2xl font-bold mb-3">Email marketing</h3>
-              <p className="text-gray-300 leading-relaxed">
-                Wdrażam oraz tworzę strategię dla Twojego sklepu
-              </p>
-            </div>
+      showScrollTop && React.createElement('button', {
+        onClick: scrollToTop,
+        style: { position: 'fixed', bottom: 32, right: 32, background: '#8b5cf6',
+          border: 'none', color: '#fff', padding: 16, borderRadius: '50%',
+          cursor: 'pointer', boxShadow: '0 4px 20px rgba(139,92,246,0.4)', zIndex: 40 }
+      }, React.createElement(ArrowUp, { size: 24 })),
 
-            <div className="bg-gray-800 rounded-xl p-8 border border-gray-700 hover:border-purple-500 transition-all">
-              <Sparkles className="text-purple-400 mb-4" size={32} />
-              <h3 className="text-2xl font-bold mb-3">Marketing automation</h3>
-              <p className="text-gray-300 leading-relaxed">
-                Projektuję customer journeys i wdrażam je tak, aby pracowały za Ciebie 24/7
-              </p>
-            </div>
-
-            <div className="bg-gray-800 rounded-xl p-8 border border-gray-700 hover:border-purple-500 transition-all">
-              <PenTool className="text-purple-400 mb-4" size={32} />
-              <h3 className="text-2xl font-bold mb-3">SEO & copy</h3>
-              <p className="text-gray-300 leading-relaxed">
-                Piszę treści, które są jednocześnie przyjazne dla algorytmów i ludzi
-              </p>
-            </div>
-
-            <div className="bg-gray-800 rounded-xl p-8 border border-gray-700 hover:border-purple-500 transition-all">
-              <Target className="text-purple-400 mb-4" size={32} />
-              <h3 className="text-2xl font-bold mb-3">Meta Ads</h3>
-              <p className="text-gray-300 leading-relaxed">
-                Tworzę reklamy, które wspierają sprzedaż i cały lejek
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Projects Section */}
-      <section id="projects" className="py-20 px-6 bg-gray-800/50">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Moje projekty
-          </h2>
-          <p className="text-xl text-gray-300 mb-12">
-            Znajdziesz tu przykładowe maile, automatyzacje oraz artykuły SEO
-          </p>
-
-          <a 
-            href="https://drive.google.com/drive/folders/14pxFI_bcEJdWADP3tlIlDfX7sMA3fiaT?usp=drive_link"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 bg-purple-500 hover:bg-purple-600 text-white px-10 py-5 rounded-lg font-semibold text-lg transition-all transform hover:scale-105"
-          >
-            <span>Zobacz portfolio</span>
-            <ChevronRight size={24} />
-          </a>
-        </div>
-      </section>
-
-      {/* Contact Section */}
-      <section id="contact" className="py-20 px-6">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-center">
-            Zbudujmy coś razem!
-          </h2>
-          <p className="text-xl text-gray-300 mb-12 text-center">
-            📬 Odezwij się, może zrobimy razem coś naprawdę fajnego
-          </p>
-
-          {/* Success Message */}
-          {submitStatus === 'success' && (
-            <div className="mb-8 bg-green-500/20 border border-green-500 rounded-lg p-4 flex items-center gap-3">
-              <CheckCircle className="text-green-400 flex-shrink-0" size={24} />
-              <div>
-                <p className="text-green-400 font-semibold">Wiadomość wysłana!</p>
-                <p className="text-green-300 text-sm">Dziękuję za kontakt. Odpiszę najszybciej jak to możliwe!</p>
-              </div>
-            </div>
-          )}
-
-          {/* Error Message */}
-          {submitStatus === 'error' && (
-            <div className="mb-8 bg-red-500/20 border border-red-500 rounded-lg p-4 flex items-center gap-3">
-              <AlertCircle className="text-red-400 flex-shrink-0" size={24} />
-              <div>
-                <p className="text-red-400 font-semibold">Wystąpił błąd</p>
-                <p className="text-red-300 text-sm">Spróbuj ponownie lub skontaktuj się bezpośrednio przez email.</p>
-              </div>
-            </div>
-          )}
-
-          <div className="bg-gray-800 rounded-2xl p-8 md:p-12 border border-gray-700 mb-12">
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-300">
-                  Imię <span className="text-red-400">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className={`w-full bg-gray-900 border ${formErrors.name ? 'border-red-500' : 'border-gray-700'} rounded-lg px-4 py-3 focus:outline-none focus:border-purple-500 transition-colors`}
-                  placeholder="Twoje imię"
-                />
-                {formErrors.name && (
-                  <p className="mt-1 text-sm text-red-400">{formErrors.name}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-300">
-                  Email <span className="text-red-400">*</span>
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className={`w-full bg-gray-900 border ${formErrors.email ? 'border-red-500' : 'border-gray-700'} rounded-lg px-4 py-3 focus:outline-none focus:border-purple-500 transition-colors`}
-                  placeholder="twoj@email.pl"
-                />
-                {formErrors.email && (
-                  <p className="mt-1 text-sm text-red-400">{formErrors.email}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-300">
-                  Wiadomość <span className="text-red-400">*</span>
-                </label>
-                <textarea
-                  name="message"
-                  value={formData.message}
-                  onChange={handleInputChange}
-                  rows="5"
-                  className={`w-full bg-gray-900 border ${formErrors.message ? 'border-red-500' : 'border-gray-700'} rounded-lg px-4 py-3 focus:outline-none focus:border-purple-500 transition-colors resize-none`}
-                  placeholder="Opowiedz o swoim projekcie..."
-                ></textarea>
-                {formErrors.message && (
-                  <p className="mt-1 text-sm text-red-400">{formErrors.message}</p>
-                )}
-              </div>
-
-              <button
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                className={`w-full bg-purple-500 hover:bg-purple-600 text-white px-8 py-4 rounded-lg font-semibold transition-all transform hover:scale-105 ${
-                  isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
-              >
-                {isSubmitting ? 'Wysyłanie...' : 'Wyślij wiadomość'}
-              </button>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <a
-              href="https://calendly.com/jcob-business-writting"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 bg-gray-800 hover:bg-gray-700 p-6 rounded-xl border border-gray-700 transition-all"
-            >
-              <Calendar className="text-purple-400" size={24} />
-              <div>
-                <div className="font-semibold">Zarezerwuj call</div>
-                <div className="text-sm text-gray-400">Calendly</div>
-              </div>
-            </a>
-
-            <a
-              href="https://www.linkedin.com/in/jakub-rząca-435b1b265"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 bg-gray-800 hover:bg-gray-700 p-6 rounded-xl border border-gray-700 transition-all"
-            >
-              <Linkedin className="text-purple-400" size={24} />
-              <div>
-                <div className="font-semibold">LinkedIn</div>
-                <div className="text-sm text-gray-400">Połączmy się</div>
-              </div>
-            </a>
-
-            <a
-              href="mailto:jcob.business.writting@gmail.com"
-              className="flex items-center gap-3 bg-gray-800 hover:bg-gray-700 p-6 rounded-xl border border-gray-700 transition-all"
-            >
-              <Mail className="text-purple-400" size={24} />
-              <div>
-                <div className="font-semibold">Email</div>
-                <div className="text-sm text-gray-400">Napisz bezpośrednio</div>
-              </div>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-8 px-6 border-t border-gray-800">
-        <div className="max-w-6xl mx-auto text-center text-gray-400">
-          <p>© 2025 Jakub Rząca. Wszystkie prawa zastrzeżone.</p>
-        </div>
-      </footer>
-
-      {/* Scroll to Top Button */}
-      {showScrollTop && (
-        <button
-          onClick={scrollToTop}
-          className="fixed bottom-8 right-8 bg-purple-500 hover:bg-purple-600 text-white p-4 rounded-full shadow-lg transition-all transform hover:scale-110 z-40"
-          aria-label="Przewiń do góry"
-        >
-          <ArrowUp size={24} />
-        </button>
-      )}
-    </div>
+      React.createElement('style', null, `
+        @media (max-width: 768px) {
+          #desktop-nav { display: none !important; }
+          #mobile-menu-btn { display: flex !important; }
+          section { padding-left: 16px !important; padding-right: 16px !important; }
+        }
+      `)
+    )
   );
 }
+
+ReactDOM.render(React.createElement(Portfolio), document.getElementById('root'));
+</script>
+</body>
+</html>
